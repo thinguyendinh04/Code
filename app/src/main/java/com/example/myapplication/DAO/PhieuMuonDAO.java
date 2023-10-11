@@ -64,11 +64,7 @@ public class PhieuMuonDAO {
             obj.setTienThue(Integer.parseInt(c.getString(c.getColumnIndex("tienThue"))));
             obj.setTraSach(Integer.parseInt(c.getString(c.getColumnIndex("traSach"))));
             obj.setMaTT(c.getString(c.getColumnIndex("maTT")));
-            try {
-                obj.setNgay(sdf.parse(c.getString(c.getColumnIndex("ngay"))));
-            }catch (ParseException e){
-                e.printStackTrace();
-            }
+            obj.setNgay(c.getString(c.getColumnIndex("ngay")));
             list.add(obj);
         }
         return list;

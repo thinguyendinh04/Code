@@ -21,12 +21,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.Adapter.LoaiSachAdapter;
 import com.example.myapplication.Adapter.PhieuMuonAdapter;
 import com.example.myapplication.Adapter.SachSpinnerAdapter;
 import com.example.myapplication.Adapter.ThanhvienSpinnerAdapter;
 import com.example.myapplication.DAO.PhieuMuonDAO;
 import com.example.myapplication.DAO.SachDAO;
 import com.example.myapplication.DAO.ThanhVienDAO;
+import com.example.myapplication.Model.LoaiSach;
 import com.example.myapplication.Model.PhieuMuon;
 import com.example.myapplication.Model.Sach;
 import com.example.myapplication.Model.ThanhVien;
@@ -69,137 +71,34 @@ public class PhieuMuonFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_phieu_muon, container, false);
         lv = view.findViewById(R.id.lvphieumuon);
         fab = view.findViewById(R.id.fabButton);
-        dao = new PhieuMuonDAO(getActivity());
-        CapNhatLv();
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialog(getActivity(), 0);
+                openDiaLog(getActivity(), 0);
             }
         });
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                item = list_pm.get(position);
+                openDiaLog(getActivity(), 1); //update
+                return false;
+            }
+        });
+
         return view;
     }
 
-    private void openDialog(FragmentActivity activity, int i) {
-        dialog = new Dialog(getContext());
-        dialog.setContentView(R.layout.phieumuon_dialog);
-        edtMaPM = dialog.findViewById(R.id.edt_mapm);
-        spinnertv = dialog.findViewById(R.id.spinnerTv);
-        spinnersach = dialog.findViewById(R.id.spinnerSach);
-        tvNgay = dialog.findViewById(R.id.tv_Ngaythue);
-        tvTienthue = dialog.findViewById(R.id.tv_tienthue);
-        chkTrasach = dialog.findViewById(R.id.chkTrangThai_itemAddPM);
-        btnCancel = dialog.findViewById(R.id.btnHuy_itemAddPM);
-        btnSave = dialog.findViewById(R.id.btnSave_itemAddPM);
-        thanhVienDAO = new ThanhVienDAO(getContext());
-        list_thanhvien = new ArrayList<ThanhVien>();
-        list_thanhvien = (ArrayList<ThanhVien>) thanhVienDAO.getAll();
-        thanhvienSpinnerAdapter = new ThanhvienSpinnerAdapter(getContext(),list_thanhvien);
-        spinnertv.setAdapter(thanhvienSpinnerAdapter);
-
-        spinnertv.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mathanhvien = list_thanhvien.get(position).getMaTV();
-                Toast.makeText(activity, "Chọn: "+ list_thanhvien.get(position).getHoTen(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        sachDAO= new SachDAO(getContext());
-        list_sach = (ArrayList<Sach>) sachDAO.getAll();
-        sachSpinnerAdapter = new SachSpinnerAdapter(getContext(), list_sach);
-        spinnersach.setAdapter(sachSpinnerAdapter);
-
-        spinnersach.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                masach = list_sach.get(position).getMaSach();
-                tienthue = list_sach.get(position).getGiaThue();
-                Toast.makeText(activity, "Chọn" + list_sach.get(position).getTenSach(), Toast.LENGTH_SHORT).show();
-                tvTienthue.setText(String.valueOf(tienthue));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        if (i == 0) {
-            btnSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String masach = edtMaPM.getText().toString();
-                    if (masach.isEmpty()) {
-                        Toast.makeText(activity, "Vui lòng nhập mã phiếu mượn", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (validate() > 0) {
-                            item = new PhieuMuon();
-                            item.setMaSach(Integer.parseInt(masach));
-                            item.setMaTV(mathanhvien);
-                            item.setNgay(new Date(System.currentTimeMillis()));
-                            item.setTienThue(tienthue);
-
-                            if (chkTrasach.isChecked()) {
-                                item.setTraSach(1);
-                            } else {
-                                item.setTraSach(0);
-                            }
-
-                            long result = dao.insert(item);
-                            if (result > 0) {
-                                Toast.makeText(activity, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                                CapNhatLv();
-                                dialog.dismiss();
-                            } else {
-                                Toast.makeText(activity, "Thêm thất bại", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(activity, "Kiểm tra lại thông tin", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            });
-        } else {
-            // update
-            btnSave.setText("Update");
-            edtMaPM.setText(list_pm.get(i).getMaPM());
-            edtMaPM.setEnabled(false);
-            dialog.show();
-        }
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
-
-    public void CapNhatLv() {
+    void capNhatLv() {
         list_pm = (ArrayList<PhieuMuon>) dao.getAll();
-        phieuMuonAdapter = new PhieuMuonAdapter(getContext(), list_pm);
+        phieuMuonAdapter = new PhieuMuonAdapter(getActivity(), list_pm);
         lv.setAdapter(phieuMuonAdapter);
-        phieuMuonAdapter.notifyDataSetChanged(); // Thông báo cập nhật dữ liệu
     }
 
-    public int validate() {
-        int check = 1;
-        if (edtMaPM.getText().toString().isEmpty()) {
-            check = -1;
-        }
-        return check;
-    }
-
-    public void xoa(String s) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+    public void xoa(final String Id) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
         builder.setTitle("Delete");
         builder.setMessage("Bạn có chắc chắn muốn xóa không?");
         builder.setCancelable(true);
@@ -209,8 +108,10 @@ public class PhieuMuonFragment extends Fragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        dao.delete(String.valueOf(Integer.parseInt(s)));
-                        CapNhatLv();
+                        //gọi delete
+                        dao.delete(Id);
+                        //cập nhật
+                        capNhatLv();
                         dialog.cancel();
                     }
                 });
@@ -224,5 +125,70 @@ public class PhieuMuonFragment extends Fragment {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+
+
+
+    private void openDiaLog(FragmentActivity activity, int i) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.phieumuon_dialog, null);
+        builder.setView(dialogView);
+
+        edtMaPM = dialogView.findViewById(R.id.edt_mapm);
+        spinnertv = dialogView.findViewById(R.id.spinnerTv);
+        spinnersach = dialogView.findViewById(R.id.spinnerSach);
+        tvNgay = dialogView.findViewById(R.id.tv_Ngaythue);
+        tvTienthue = dialogView.findViewById(R.id.tv_tienthue);
+        btnSave = dialogView.findViewById(R.id.btnSave_itemAddPM);
+        btnCancel = dialogView.findViewById(R.id.btnHuy_itemAddPM);
+
+        // Tạo adapter cho spinner ThanhVien
+        thanhvienSpinnerAdapter = new ThanhvienSpinnerAdapter(getActivity(), list_thanhvien);
+        spinnertv.setAdapter(thanhvienSpinnerAdapter);
+
+        // Tạo adapter cho spinner Sach
+        sachSpinnerAdapter = new SachSpinnerAdapter(getActivity(), list_sach);
+        spinnersach.setAdapter(sachSpinnerAdapter);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int mapm = Integer.parseInt(edtMaPM.getText().toString());
+                // Lấy thông tin thành viên được chọn
+                ThanhVien thanhVien = (ThanhVien) spinnertv.getSelectedItem();
+                int mathanhvien = thanhVien.getMaTV();
+                // Lấy thông tin sách được chọn
+                Sach sach = (Sach) spinnersach.getSelectedItem();
+                int masach = sach.getMaSach();
+
+                // Lấy ngày hiện tại
+                String currentDate = sdf.format(new Date(System.currentTimeMillis()));
+                tvNgay.setText(currentDate);
+                // Lấy tiền thuê sách
+                int tienthue = Integer.parseInt(tvTienthue.getText().toString());
+
+                // Thực hiện lưu thông tin vào cơ sở dữ liệu
+                PhieuMuon phieuMuon = new PhieuMuon(mapm, mathanhvien, masach, currentDate, tienthue);
+                dao.insert(phieuMuon);
+
+                // Cập nhật ListView
+                capNhatLv();
+
+                Toast.makeText(getActivity(), "Thêm phiếu mượn thành công", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog = builder.create();
+        dialog.show();
     }
 }
