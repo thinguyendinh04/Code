@@ -7,7 +7,7 @@ public class PhieuMuon {
     private String maTT;
     private int maTV;
     private int maSach;
-    private String ngay;
+    private Date ngay;
     private int tienThue;
     private int traSach;
 
@@ -46,11 +46,11 @@ public class PhieuMuon {
         this.maSach = maSach;
     }
 
-    public String getNgay() {
+    public Date getNgay() {
         return ngay;
     }
 
-    public void setNgay(String ngay) {
+    public void setNgay(Date ngay) {
         this.ngay = ngay;
     }
 
@@ -70,7 +70,7 @@ public class PhieuMuon {
         this.traSach = traSach;
     }
 
-    public PhieuMuon(int maPM, String maTT, int maTV, int maSach, String ngay, int tienThue, int traSach) {
+    public PhieuMuon(int maPM, String maTT, int maTV, int maSach, Date ngay, int tienThue, int traSach) {
         this.maPM = maPM;
         this.maTT = maTT;
         this.maTV = maTV;

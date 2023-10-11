@@ -55,14 +55,9 @@ public class PhieuMuonFragment extends Fragment {
     ThanhvienSpinnerAdapter thanhvienSpinnerAdapter;
     ArrayList<ThanhVien> list_thanhvien;
     ThanhVienDAO thanhVienDAO;
-    ThanhVien thanhVien;
-    int mathanhvien;
     SachSpinnerAdapter sachSpinnerAdapter;
     ArrayList<Sach> list_sach;
     SachDAO sachDAO;
-    Sach sach;
-    int masach, tienthue;
-    int PositionTV, PositionSach;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
@@ -71,6 +66,9 @@ public class PhieuMuonFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_phieu_muon, container, false);
         lv = view.findViewById(R.id.lvphieumuon);
         fab = view.findViewById(R.id.fabButton);
+        thanhVienDAO = new ThanhVienDAO(getContext());
+        sachDAO = new SachDAO(getContext());
+        dao = new PhieuMuonDAO(getContext());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,12 +142,14 @@ public class PhieuMuonFragment extends Fragment {
         btnSave = dialogView.findViewById(R.id.btnSave_itemAddPM);
         btnCancel = dialogView.findViewById(R.id.btnHuy_itemAddPM);
 
+        list_thanhvien =(ArrayList<ThanhVien>) thanhVienDAO.getAll();
         // Tạo adapter cho spinner ThanhVien
-        thanhvienSpinnerAdapter = new ThanhvienSpinnerAdapter(getActivity(), list_thanhvien);
+        thanhvienSpinnerAdapter = new ThanhvienSpinnerAdapter(getContext(), list_thanhvien);
         spinnertv.setAdapter(thanhvienSpinnerAdapter);
 
+        list_sach = (ArrayList<Sach>) sachDAO.getAll();
         // Tạo adapter cho spinner Sach
-        sachSpinnerAdapter = new SachSpinnerAdapter(getActivity(), list_sach);
+        sachSpinnerAdapter = new SachSpinnerAdapter(getContext(), list_sach);
         spinnersach.setAdapter(sachSpinnerAdapter);
 
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -167,7 +167,9 @@ public class PhieuMuonFragment extends Fragment {
                 String currentDate = sdf.format(new Date(System.currentTimeMillis()));
                 tvNgay.setText(currentDate);
                 // Lấy tiền thuê sách
-                int tienthue = Integer.parseInt(tvTienthue.getText().toString());
+               sach = (Sach) spinnersach.getSelectedItem();
+               int tienthue = sach.getGiaThue();
+               tvTienthue.setText(tienthue);
 
                 // Thực hiện lưu thông tin vào cơ sở dữ liệu
                 PhieuMuon phieuMuon = new PhieuMuon(mapm, mathanhvien, masach, currentDate, tienthue);

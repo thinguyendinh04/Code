@@ -18,12 +18,12 @@ import java.util.List;
 
 public class ThanhvienSpinnerAdapter extends ArrayAdapter<ThanhVien> {
     Context context;
-    ArrayAdapter<ThanhVien> list;
+    ArrayList<ThanhVien> list;
     TextView tv_matv, tv_tentv;
 
-    public ThanhvienSpinnerAdapter(@NonNull Context context, int resource, Context context1, ArrayAdapter<ThanhVien> list) {
+    public ThanhvienSpinnerAdapter(@NonNull Context context, ArrayList<ThanhVien> list) {
         super(context, 0, (List<ThanhVien>) list);
-        this.context = context1;
+        this.context = context;
         this.list = list;
     }
 
@@ -35,7 +35,7 @@ public class ThanhvienSpinnerAdapter extends ArrayAdapter<ThanhVien> {
             LayoutInflater inflater = LayoutInflater.from(context);
             v = inflater.inflate(R.layout.thanh_vien_item_spinner, parent, false);
         }
-        ThanhVien item = list.getItem(position);
+        ThanhVien item = list.get(position);
         if (item != null) {
             tv_matv = v.findViewById(R.id.tv_matv_thanhvien);
             tv_matv.setText(item.getMaTV() + ":");
@@ -52,7 +52,7 @@ public class ThanhvienSpinnerAdapter extends ArrayAdapter<ThanhVien> {
             LayoutInflater inflater = LayoutInflater.from(context);
             v = inflater.inflate(R.layout.thanh_vien_item_spinner, parent, false);
         }
-        ThanhVien item = list.getItem(position);
+        ThanhVien item = list.get(position);
         if (item != null) {
             tv_matv = v.findViewById(R.id.tv_matv_thanhvien);
             tv_matv.setText(item.getMaTV() + ":");
@@ -60,9 +60,5 @@ public class ThanhvienSpinnerAdapter extends ArrayAdapter<ThanhVien> {
             tv_tentv.setText(item.getHoTen());
         }
         return v;
-    }
-
-    public ThanhvienSpinnerAdapter(@NonNull Context context, ArrayList<ThanhVien> resource) {
-        super(context, 0);
     }
 }
